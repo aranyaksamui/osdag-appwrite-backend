@@ -6,7 +6,7 @@ let storage = null;
 // Appwrite web instances based on input fields
 export const getSettings = () => {
     const settings = {
-        endpoint: document.getElementById("awEndpoint")?.value || "https://cloud.appwrite.io/v1",
+        endpoint: document.getElementById("awEndpoint")?.value || "https://sgp.cloud.appwrite.io/v1",
         projectId: document.getElementById("awProjectId")?.value || "",
         databaseId: document.getElementById("awDatabaseId")?.value || "osdag_db",
         filesCollectionId: document.getElementById("awFilesCollectionId")?.value || "files",
@@ -16,18 +16,25 @@ export const getSettings = () => {
     return settings;
 }
 
-export const initAppwrite = () => {
+export function initAppwrite() {
     const { endpoint, projectId } = getSettings();
+    const sdk = window.Appwrite;
 
-    if (!projectId || projectId == "PROJECT_ID") return null;
-
-    if (!client && window.Appwrite) {
-        client = new window.Appwrite.Client();
-        client.setEndpoint(endpoint).setProject(projectId);
-        account = new window.Appwrite.Account(client);
-        databases = new window.Appwrite.Databases(client);
-        storage = new window.Appwrite.Storage(client);
+    if (!sdk) {
+        console.error("Appwrite SDK not found! Check that the CDN script tag is present in index.html.");
+        return null;
     }
+
+    if (!projectId || projectId === 'YOUR_PROJECT_ID') {
+        console.error("Project ID is missing or placeholder! Please type your real Project ID in the input box.");
+        return null;
+    }
+
+    client = new sdk.Client();
+    client.setEndpoint(endpoint).setProject(projectId);
+    account = new sdk.Account(client);
+    databases = new sdk.Databases(client);
+    storage = new sdk.Storage(client);
 
     return { client, account, databases, storage };
 }
